@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exponent Concept Explorer - Alat Peraga Interaktif Eksponen</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CSS & JS for Precision Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Exponential Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .font-mono-math {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Tab Active State Styling */
+        .tab-btn.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.35);
+        }
+
+        /* Paper Card Styling */
+        .paper-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            position: relative;
+            background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+            background-size: 10px 10px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Torn Edge CSS Clip Path Effect */
+        .torn-edge {
+            clip-path: polygon(
+                0% 0%, 100% 0%, 
+                100% 92%, 95% 98%, 90% 93%, 85% 97%, 80% 92%, 75% 98%, 70% 93%, 65% 97%, 
+                60% 92%, 55% 98%, 50% 93%, 45% 97%, 40% 92%, 35% 98%, 30% 93%, 25% 97%, 
+                20% 92%, 15% 98%, 10% 93%, 5% 97%, 0% 92%
+            );
+        }
+
+        /* Directional Tearing Paper Keyframe Animations */
+        @keyframes tearPopUp {
+            0% { transform: scale(0.4) translate(var(--tx), var(--ty)) rotate(var(--rot)); opacity: 0; }
+            50% { transform: scale(1.1) translate(calc(var(--tx) * 1.2), calc(var(--ty) * 1.2)) rotate(calc(var(--rot) * 1.5)); opacity: 0.9; }
+            100% { transform: scale(1) translate(0, 0) rotate(0deg); opacity: 1; }
+        }
+
+        /* Split Rip Flash Animation for Paper Stage */
+        @keyframes paperRipSplit {
+            0% { transform: scale(1); filter: brightness(1); }
+            30% { transform: scale(0.96) rotate(-1.5deg); filter: brightness(1.2); }
+            60% { transform: scale(1.03) rotate(1.5deg); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .anim-paper-split {
+            animation: paperRipSplit 0.4s ease-in-out;
+        }
+
+        .anim-paper-pop {
+            animation: tearPopUp 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Floating Paper Debris Particles */
+        @keyframes particleFly {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0); opacity: 0; }
+        }
+
+        .paper-debris {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background-color: #f1f5f9;
+            border: 1px solid #94a3b8;
+            pointer-events: none;
+            z-index: 30;
+            border-radius: 1px;
+            animation: particleFly 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        /* Division Strike-through style for fraction cancellation */
+        .cancel-item {
+            position: relative;
+        }
+        .cancel-item::after {
+            content: '';
+            position: absolute;
+            left: -15%;
+            top: 50%;
+            width: 130%;
+            height: 3px;
+            background-color: #ef4444;
+            transform: rotate(-30deg);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-indigo-500/70 rounded-xl shadow-inner border border-indigo-400/30">
+                    <i class="fa-solid fa-cube text-2xl text-amber-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                        Exponent Concept Explorer
+                    </h1>
+                    <p class="text-xs text-indigo-100 font-medium">Alat Peraga Edukasi Visual & Simulasi Konsep Eksponen</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Sound Toggle Button -->
+                <button onclick="toggleAudio()" id="audio-toggle-btn" class="bg-indigo-700 hover:bg-indigo-800 text-amber-300 text-xs px-3 py-1.5 rounded-full border border-indigo-400/40 flex items-center gap-2 font-bold transition shadow-sm">
+                    <i id="audio-icon" class="fa-solid fa-volume-high"></i> <span id="audio-status-text">Suara: ON</span>
+                </button>
+                <span class="bg-indigo-700/80 text-indigo-100 text-xs px-3.5 py-1.5 rounded-full border border-indigo-400/40 hidden sm:flex items-center gap-2 font-semibold">
+                    <i class="fa-solid fa-graduation-cap text-amber-300"></i> Media Pembelajaran Interaktif
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-grow">
+        
+        <!-- Tab Buttons Container -->
+        <div class="flex flex-wrap gap-2 p-1.5 bg-slate-200/80 rounded-2xl mb-6 max-w-4xl mx-auto shadow-inner border border-slate-300/60">
+            <button onclick="switchTab('tab-tear')" id="btn-tab-tear" class="tab-btn active flex-1 min-w-[180px] py-3 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-scissors text-amber-300"></i> 1. Sobek Kertas ($a^n$)
+            </button>
+            <button onclick="switchTab('tab-zero-neg')" id="btn-tab-zero-neg" class="tab-btn flex-1 min-w-[180px] py-3 px-3 text-slate-600 rounded-xl font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-stairs text-indigo-500"></i> 2. Pangkat 0 & Negatif
+            </button>
+            <button onclick="switchTab('tab-properties')" id="btn-tab-properties" class="tab-btn flex-1 min-w-[180px] py-3 px-3 text-slate-600 rounded-xl font-bold text-xs sm:text-sm transition-all text-center flex items-center justify-center gap-2">
+                <i class="fa-solid fa-calculator text-emerald-500"></i> 3. Sifat-Sifat Eksponen
+            </button>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- TAB 1: DYNAMIC BASE PAPER TEAR SIMULATION ($a^n$)                 -->
+        <!-- ================================================================= -->
+        <section id="tab-tear" class="tab-content block space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-amber-500 via-indigo-600 to-indigo-700 p-6 rounded-3xl shadow-md text-white relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-scissors text-[140px]"></i>
+                </div>
+                <div class="max-w-3xl space-y-2 relative z-10">
+                    <span class="bg-amber-400 text-amber-950 font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full">Visualisasi Konsep Dasar</span>
+                    <h2 class="text-2xl font-black">Bagaimana Pemotongan Kertas Membentuk Eksponen?</h2>
+                    <p id="hero-banner-desc" class="text-xs sm:text-sm text-indigo-100 leading-relaxed font-medium">
+                        <!-- Injected via JS -->
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Interactive Visual Paper Pieces Container WITH ACTION BUTTONS ATTACHED -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-scroll text-amber-500"></i> Panggung Sobek Kertas Interaktif
+                            </h3>
+                            <span id="tear-piece-badge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full border border-indigo-200">
+                                Total: 1 Potongan
+                            </span>
+                        </div>
+
+                        <!-- Canvas/Stage for torn paper pieces -->
+                        <div id="paper-stage" class="min-h-[260px] p-5 bg-slate-100/90 rounded-2xl border-2 border-dashed border-slate-300 flex flex-wrap items-center justify-center gap-2.5 overflow-y-auto max-h-[320px] relative transition-all">
+                            <!-- Dynamically injected via JavaScript -->
+                        </div>
+
+                        <!-- ACTION BUTTONS PLACED DIRECTLY BELOW THE STAGE -->
+                        <div class="p-3 bg-amber-50/80 rounded-2xl border border-amber-200/80 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/60 pb-2">
+                                <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-scissors text-amber-600"></i> Aksi Lembar Kertas:
+                                </span>
+                                <span id="tear-n-val" class="px-2.5 py-0.5 bg-amber-200 text-amber-900 font-extrabold rounded-lg text-xs">Tahap n = 0</span>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <button onclick="tearStepNext()" class="flex-1 py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+                                    <i class="fa-solid fa-scissors"></i> Sobek Kertas Ini (+1)
+                                </button>
+                                <button onclick="tearReset()" class="py-3 px-4 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border border-slate-300 transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <i class="fa-solid fa-rotate-left"></i> Reset Utuh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Data Table Log -->
+                    <div class="border-t border-slate-100 pt-3 space-y-2">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Tabel Data Perkalian Berulang:</div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-600 border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                        <th class="p-2 rounded-l-lg">Tahap ($n$)</th>
+                                        <th class="p-2">Perkalian Berulang</th>
+                                        <th class="p-2">Bentuk $a^n$</th>
+                                        <th class="p-2 text-right rounded-r-lg">Hasil (Potongan)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tear-table-body">
+                                    <!-- Dynamically injected via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parameters & Formula Panel -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-amber-500"></i> Pengaturan Basis Bilangan
+                            </h3>
+                            <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-full">Basis Fleksibel</span>
+                        </div>
+
+                        <!-- Base (a) Selector Buttons -->
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">Pilih Nilai Basis ($a$):</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="setTearBase(2)" id="btn-base-2" class="tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-indigo-600 text-white shadow-sm border-indigo-600">
+                                    a = 2
+                                </button>
+                                <button onclick="setTearBase(3)" id="btn-base-3" class="tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200">
+                                    a = 3
+                                </button>
+                                <button onclick="setTearBase(4)" id="btn-base-4" class="tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200">
+                                    a = 4
+                                </button>
+                                <button onclick="setTearBase(5)" id="btn-base-5" class="tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200">
+                                    a = 5
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Slider for Exponent (n) -->
+                        <div class="pt-2">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Pilih Langsung Tahap ($n$):</label>
+                            </div>
+                            <input type="range" id="tear-slider" min="0" max="5" value="0" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="updatePaperTear(this.value, true)">
+                            <div id="tear-slider-labels" class="flex justify-between text-xs text-slate-400 font-bold mt-1.5">
+                                <span>0x</span><span>1x</span><span>2x</span><span>3x</span><span>4x</span><span>5x</span>
+                            </div>
+                        </div>
+
+                        <!-- Rendered Math Formula Box -->
+                        <div class="p-4 bg-amber-50/80 border border-amber-200/80 rounded-2xl space-y-2">
+                            <div class="text-[11px] uppercase font-bold tracking-wider text-amber-800">Persamaan Eksponen:</div>
+                            <div id="tear-math-formula" class="text-base sm:text-lg font-bold text-amber-950 min-h-[32px] flex items-center"></div>
+                            <div id="tear-verbal-desc" class="text-xs text-slate-700 leading-relaxed font-medium pt-2 border-t border-amber-200/60"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exponential Growth Chart Placed AT THE BOTTOM -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-indigo-600"></i> Grafik Pertumbuhan Eksponensial ($a^n$)
+                    </h3>
+                    <span id="chart-basis-badge" class="text-xs text-indigo-600 font-bold bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                        Basis a = 2
+                    </span>
+                </div>
+                <div class="h-64 bg-slate-50 p-4 border border-slate-200 rounded-2xl">
+                    <canvas id="tearChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 2: ZERO & NEGATIVE EXPONENTS ($a^0=1$, $a^{-n}=1/a^n$)        -->
+        <!-- ================================================================= -->
+        <section id="tab-zero-neg" class="tab-content hidden space-y-6">
+            <!-- Concept Banner -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl shrink-0">
+                        <i class="fa-solid fa-stairs text-2xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h2 class="text-lg font-bold text-slate-900">Konsep Pangkat Nol ($a^0 = 1$) & Pangkat Negatif ($a^{-n} = \frac{1}{a^n}$)</h2>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Mengapa bilangan berpangkat 0 sama dengan 1? Dan apa arti pangkat negatif? Perhatikan **pola pembagian konsisten** pada tangga pangkat di bawah ini!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controls -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                    <h3 class="font-bold text-slate-800 text-base border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-500"></i> Pilih Basis Bilangan ($a$)
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-semibold text-slate-700">Basis ($a$):</label>
+                            <span id="t2-a-val" class="px-3 py-0.5 bg-amber-100 text-amber-800 font-extrabold rounded-lg text-sm">a = 2</span>
+                        </div>
+                        <input type="range" id="t2-a" min="2" max="5" value="2" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-600" oninput="updateTabZeroNeg()">
+                        <div class="flex justify-between text-xs text-slate-400 font-bold mt-1"><span>2</span><span>3</span><span>4</span><span>5</span></div>
+                    </div>
+
+                    <div class="p-4 bg-amber-50 border border-amber-200/80 rounded-2xl space-y-3">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-lightbulb text-amber-600 text-sm"></i> Pola Kunci Pembagian:
+                        </div>
+                        <ul class="text-xs text-amber-950 space-y-1.5 font-medium leading-relaxed">
+                            <li class="flex items-start gap-1.5">
+                                <i class="fa-solid fa-arrow-down text-amber-600 mt-0.5"></i>
+                                <span>Turun 1 tingkat pangkat = <b>Dibagi basis ($a$)</b>.</span>
+                            </li>
+                            <li class="flex items-start gap-1.5">
+                                <i class="fa-solid fa-arrow-up text-amber-600 mt-0.5"></i>
+                                <span>Naik 1 tingkat pangkat = <b>Dikali basis ($a$)</b>.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="t2-logic-summary" class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2 text-slate-700">
+                        <!-- Dynamically injected via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Interactive Ladder Table -->
+                <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-indigo-500"></i> Tangga Pembagian Pangkat
+                        </h3>
+                        <span class="text-xs text-slate-400 font-medium">Perhatikan pergerakan nilai dari atas ke bawah</span>
+                    </div>
+
+                    <div id="t2-ladder-container" class="space-y-2.5 py-1">
+                        <!-- Dynamically injected via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 3: EXPONENT PROPERTIES INTERACTIVE ($a^m \times a^n$, etc.)   -->
+        <!-- ================================================================= -->
+        <section id="tab-properties" class="tab-content hidden space-y-6">
+            <!-- Header Banner -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl shrink-0">
+                        <i class="fa-solid fa-layer-group text-2xl"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h2 class="text-lg font-bold text-slate-900">Eksplorasi Sifat-Sifat Operasi Eksponen</h2>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Ubah nilai basis dan pangkat untuk melihat bagaimana faktor-faktor bilangan digabungkan, dieliminasi (dicoret), atau dikalikan berulang.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Switcher Tabs -->
+            <div class="flex justify-center">
+                <div class="inline-flex p-1.5 bg-slate-200/80 rounded-2xl border border-slate-300/60 gap-1">
+                    <button onclick="setTab3Prop('mul')" id="t3-btn-mul" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-xmark"></i> Perkalian ($a^m \cdot a^n$)
+                    </button>
+                    <button onclick="setTab3Prop('div')" id="t3-btn-div" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                        <i class="fa-solid fa-divide"></i> Pembagian ($a^m \div a^n$)
+                    </button>
+                    <button onclick="setTab3Prop('pow')" id="t3-btn-pow" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group"></i> Perpangkatan ($(a^m)^n$)
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Controls Panel -->
+                <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                    <h3 class="font-bold text-slate-800 text-base border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-500"></i> Parameter Nilai
+                    </h3>
+
+                    <!-- Basis Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Basis ($a$):</label>
+                            <span id="t3-a-val" class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 font-extrabold rounded text-xs">a = 3</span>
+                        </div>
+                        <input type="range" id="t3-a" min="2" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600" oninput="updateTab3Properties()">
+                    </div>
+
+                    <!-- m Exponent Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Pangkat Pertama ($m$):</label>
+                            <span id="t3-m-val" class="px-2.5 py-0.5 bg-indigo-100 text-indigo-800 font-extrabold rounded text-xs">m = 4</span>
+                        </div>
+                        <input type="range" id="t3-m" min="1" max="5" value="4" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateTab3Properties()">
+                    </div>
+
+                    <!-- n Exponent Slider -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Pangkat Kedua ($n$):</label>
+                            <span id="t3-n-val" class="px-2.5 py-0.5 bg-purple-100 text-purple-800 font-extrabold rounded text-xs">n = 2</span>
+                        </div>
+                        <input type="range" id="t3-n" min="1" max="5" value="2" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600" oninput="updateTab3Properties()">
+                    </div>
+
+                    <!-- Property Rule Card -->
+                    <div class="p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl space-y-2">
+                        <div class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Rumus / Aturan Sifat:</div>
+                        <div id="t3-rule-box" class="text-xs text-emerald-950 font-medium leading-relaxed">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Explanation Panel -->
+                <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between space-y-6">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-emerald-500"></i> Visualisasi Pengelompokan Faktor
+                            </h3>
+                            <div id="t3-math-formula" class="text-base sm:text-lg font-bold text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-xl border border-emerald-200/60"></div>
+                        </div>
+
+                        <!-- Dynamic Visual Factors Canvas -->
+                        <div id="t3-visual-container" class="p-6 bg-slate-50 border border-slate-200 rounded-2xl min-h-[200px] flex flex-col justify-center items-center gap-4">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500 font-medium">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span>Exponent Concept Explorer &copy; Media Pembelajaran Matematika Interaktif</span>
+            <span>Berbasis KaTeX, Realistic Audio Synthesizer, & Visualisasi Sobekan Kertas</span>
+        </div>
+    </footer>
+
+    <script>
+        // Global State Variables
+        let currentTearBase = 2;
+        let currentTearN = 0;
+        let tearChart = null;
+        let activeTab3Prop = 'mul';
+        let isAudioMuted = false;
+        let audioCtx = null;
+
+        // Realistic Paper Rip Audio Synthesizer using Granular Audio Synthesis
+        function playPaperRipSound() {
+            if (isAudioMuted) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const duration = 0.35; // 350ms tearing sound duration
+                const bufferSize = audioCtx.sampleRate * duration;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                // Granular micro-burst synthesis for realistic paper tearing texture ("Srrkkk!")
+                for (let i = 0; i < bufferSize; i++) {
+                    const progress = i / bufferSize;
+                    // Envelope: fast attack, fluttering sustain, smooth decay
+                    const envelope = Math.sin(progress * Math.PI) * (1 - Math.pow(progress, 0.8));
+                    
+                    // High-frequency noise + micro crackle impulses
+                    const baseNoise = (Math.random() * 2 - 1);
+                    const crackleImpulse = (Math.random() > 0.84) ? (Math.random() * 2 - 1) * 3.5 : 0.8;
+                    
+                    data[i] = baseNoise * crackleImpulse * envelope;
+                }
+
+                const noiseSource = audioCtx.createBufferSource();
+                noiseSource.buffer = buffer;
+
+                // Bandpass Filter isolating paper tearing frequencies (800Hz - 3200Hz)
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(1800, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(1100, audioCtx.currentTime + duration);
+                filter.Q.setValueAtTime(1.5, audioCtx.currentTime);
+
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.75, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+                noiseSource.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                noiseSource.start();
+            } catch (e) {
+                console.log("Audio play error:", e);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audio-icon');
+            const statusText = document.getElementById('audio-status-text');
+            const btn = document.getElementById('audio-toggle-btn');
+
+            if (isAudioMuted) {
+                icon.className = 'fa-solid fa-volume-xmark';
+                statusText.innerText = 'Suara: OFF';
+                btn.classList.add('opacity-70');
+            } else {
+                icon.className = 'fa-solid fa-volume-high';
+                statusText.innerText = 'Suara: ON';
+                btn.classList.remove('opacity-70');
+                playPaperRipSound();
+            }
+        }
+
+        // Safe KaTeX Helper Function
+        function renderMath(tex, elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            try {
+                katex.render(tex, el, {
+                    throwOnError: false,
+                    displayMode: false
+                });
+            } catch (e) {
+                el.innerText = tex;
+            }
+        }
+
+        // Tab Switcher Handler
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+
+            if (tabId === 'tab-tear') updatePaperTear(currentTearN);
+            if (tabId === 'tab-zero-neg') updateTabZeroNeg();
+            if (tabId === 'tab-properties') updateTab3Properties();
+        }
+
+        // ====================================================================
+        // TAB 1: DYNAMIC BASE PAPER TEAR SIMULATION
+        // ====================================================================
+        function initTearChart() {
+            const ctx = document.getElementById('tearChart').getContext('2d');
+            tearChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0x', '1x', '2x', '3x', '4x', '5x'],
+                    datasets: [{
+                        label: 'Jumlah Potongan Kertas',
+                        data: [1, 2, 4, 8, 16, 32],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 11, family: 'Plus Jakarta Sans' } }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { size: 11, family: 'Plus Jakarta Sans' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setTearBase(b) {
+            currentTearBase = b;
+
+            // Update Base Selector Buttons UI
+            [2, 3, 4, 5].forEach(val => {
+                const btn = document.getElementById(`btn-base-${val}`);
+                if (val === b) {
+                    btn.className = 'tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-indigo-600 text-white shadow-sm border-indigo-600';
+                } else {
+                    btn.className = 'tear-base-btn py-2 px-3 rounded-xl border font-black text-sm transition text-center bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200';
+                }
+            });
+
+            // Adjust slider max based on base to prevent DOM overflow
+            const slider = document.getElementById('tear-slider');
+            const maxN = (b >= 4) ? 4 : 5;
+            slider.max = maxN;
+
+            const sliderLabels = document.getElementById('tear-slider-labels');
+            sliderLabels.innerHTML = '';
+            for (let i = 0; i <= maxN; i++) {
+                sliderLabels.innerHTML += `<span>${i}x</span>`;
+            }
+
+            if (currentTearN > maxN) currentTearN = maxN;
+            slider.value = currentTearN;
+
+            updatePaperTear(currentTearN, true);
+        }
+
+        function tearStepNext() {
+            const maxN = (currentTearBase >= 4) ? 4 : 5;
+            if (currentTearN < maxN) {
+                currentTearN++;
+                document.getElementById('tear-slider').value = currentTearN;
+                updatePaperTear(currentTearN, true);
+            }
+        }
+
+        function tearReset() {
+            currentTearN = 0;
+            document.getElementById('tear-slider').value = 0;
+            updatePaperTear(0, false);
+        }
+
+        function createPaperDebrisParticles(stage) {
+            const rect = stage.getBoundingClientRect();
+            for (let i = 0; i < 18; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'paper-debris';
+                
+                const startX = rect.width / 2 + (Math.random() * 80 - 40);
+                const startY = rect.height / 2 + (Math.random() * 50 - 25);
+                
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                
+                const dx = (Math.random() - 0.5) * 180;
+                const dy = (Math.random() - 0.5) * 150 - 20;
+                const rot = (Math.random() - 0.5) * 360;
+                
+                particle.style.setProperty('--dx', `${dx}px`);
+                particle.style.setProperty('--dy', `${dy}px`);
+                particle.style.setProperty('--rot', `${rot}deg`);
+                
+                stage.appendChild(particle);
+                setTimeout(() => particle.remove(), 550);
+            }
+        }
+
+        function updatePaperTear(nVal, triggerAnimation = false) {
+            currentTearN = parseInt(nVal);
+            const a = currentTearBase;
+            const n = currentTearN;
+            const count = Math.pow(a, n);
+
+            document.getElementById('tear-n-val').innerText = `Tahap n = ${n}`;
+            document.getElementById('tear-piece-badge').innerText = `Total: ${count} Potongan Lembar`;
+            document.getElementById('chart-basis-badge').innerText = `Basis a = ${a}`;
+
+            // Hero Banner Description Dynamic Update
+            const heroDesc = document.getElementById('hero-banner-desc');
+            heroDesc.innerHTML = `
+                Setiap kali kertas dipotong/ditumpuk pada tahap $n$, 1 lembar dipotong menjadi <b>${a} bagian sama besar</b>.
+                Jumlah potongan kertas bertambah <b>${a} kali lipat</b> dari tahap sebelumnya: 
+                <span id="hero-math-seq" class="font-bold text-amber-200"></span>.
+            `;
+            renderMath(`${a}^0 \\rightarrow ${a}^1 \\rightarrow ${a}^2 \\rightarrow ${a}^3 \\rightarrow ${a}^n`, 'hero-math-seq');
+
+            const stage = document.getElementById('paper-stage');
+
+            if (triggerAnimation) {
+                playPaperRipSound();
+                stage.classList.remove('anim-paper-split');
+                void stage.offsetWidth; // Trigger reflow for restart animation
+                stage.classList.add('anim-paper-split');
+            }
+
+            // Render Math Formula Expression
+            let multTex = '';
+            if (n === 0) {
+                multTex = `${a}^0 = 1 \\text{ (lembar utuh)}`;
+            } else {
+                let factors = Array(n).fill(a.toString()).join(' \\times ');
+                multTex = `${a}^{${n}} = \\underbrace{${factors}}_{${n} \\text{ kali}} = ${count}`;
+            }
+            renderMath(multTex, 'tear-math-formula');
+
+            // Verbal Description Narrative
+            const verbalEl = document.getElementById('tear-verbal-desc');
+            if (n === 0) {
+                verbalEl.innerHTML = `<b>Tahap Awal ($n=0$)</b>: Kertas belum dipotong. Menghasilkan tepat <b>1 lembar utuh</b> ($${a}^0 = 1$).`;
+            } else {
+                verbalEl.innerHTML = `Satu potongan dipotong menjadi <b>${a} bagian sama besar</b>, sehingga pada tahap ke-${n} jumlah potongan = $${a}^{${n}} = ${count}$ lembar.`;
+                renderMathInElement(verbalEl, { delimiters: [{left: "$", right: "$", display: false}] });
+            }
+
+            // Render Torn Paper Pieces Stage
+            stage.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                const paper = document.createElement('div');
+                let animStyle = '';
+                if (triggerAnimation) {
+                    const tx = (Math.random() - 0.5) * 40;
+                    const ty = (Math.random() - 0.5) * 30;
+                    const rot = (Math.random() - 0.5) * 20;
+                    paper.style.setProperty('--tx', `${tx}px`);
+                    paper.style.setProperty('--ty', `${ty}px`);
+                    paper.style.setProperty('--rot', `${rot}deg`);
+                    animStyle = 'anim-paper-pop';
+                }
+
+                paper.className = `paper-card torn-edge p-2 rounded-lg flex flex-col items-center justify-center w-14 h-16 sm:w-16 sm:h-20 text-center shadow-sm ${animStyle}`;
+                paper.innerHTML = `
+                    <div class="text-[9px] text-amber-600 font-bold"><i class="fa-solid fa-scissors"></i></div>
+                    <span class="font-mono-math text-indigo-900 font-bold text-xs">#${i}</span>
+                    <span class="text-[9px] text-slate-400 font-bold">${a}<sup>${n}</sup></span>
+                `;
+                stage.appendChild(paper);
+            }
+
+            if (triggerAnimation) {
+                createPaperDebrisParticles(stage);
+            }
+
+            // Update Chart.js Data & Radius
+            if (tearChart) {
+                const maxN = (a >= 4) ? 4 : 5;
+                const labels = [];
+                const dataValues = [];
+
+                for (let i = 0; i <= maxN; i++) {
+                    labels.push(`${i}x`);
+                    dataValues.push(Math.pow(a, i));
+                }
+
+                tearChart.data.labels = labels;
+                tearChart.data.datasets[0].data = dataValues;
+                tearChart.data.datasets[0].label = `Potongan Kertas (${a}ⁿ)`;
+                tearChart.data.datasets[0].pointRadius = labels.map((_, idx) => idx === n ? 8 : 4);
+                tearChart.data.datasets[0].pointBackgroundColor = labels.map((_, idx) => idx === n ? '#f59e0b' : '#4f46e5');
+                tearChart.update();
+            }
+
+            renderTearLogTable(a, n);
+        }
+
+        function renderTearLogTable(a, activeN) {
+            const tbody = document.getElementById('tear-table-body');
+            tbody.innerHTML = '';
+            const maxN = (a >= 4) ? 4 : 5;
+
+            for (let i = 0; i <= maxN; i++) {
+                const tr = document.createElement('tr');
+                const isCurrent = (i === activeN);
+                tr.className = `border-b border-slate-100 transition ${isCurrent ? 'bg-amber-100/80 font-bold text-amber-950' : 'hover:bg-slate-50'}`;
+
+                let multText = (i === 0) ? '1' : Array(i).fill(a.toString()).join(' × ');
+                const val = Math.pow(a, i);
+
+                tr.innerHTML = `
+                    <td class="p-2 font-semibold">Tahap ke-${i}</td>
+                    <td class="p-2 font-mono text-[11px] text-slate-600">${multText}</td>
+                    <td class="p-2 font-bold text-indigo-600">${a}<sup>${i}</sup></td>
+                    <td class="p-2 text-right font-bold">${val} lembar</td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        // ====================================================================
+        // TAB 2: ZERO & NEGATIVE EXPONENTS LOGIC
+        // ====================================================================
+        function updateTabZeroNeg() {
+            const a = parseInt(document.getElementById('t2-a').value);
+            document.getElementById('t2-a-val').innerText = `a = ${a}`;
+
+            const container = document.getElementById('t2-ladder-container');
+            container.innerHTML = '';
+
+            const powers = [3, 2, 1, 0, -1, -2, -3];
+
+            powers.forEach((p) => {
+                const row = document.createElement('div');
+                const isZero = (p === 0);
+                const isNeg = (p < 0);
+
+                let bgStyle = 'bg-slate-50 border-slate-200';
+                if (isZero) bgStyle = 'bg-amber-100/80 border-amber-300 font-bold shadow-sm ring-2 ring-amber-400/30';
+                else if (isNeg) bgStyle = 'bg-indigo-50/50 border-indigo-200';
+
+                row.className = `p-3 rounded-xl border flex items-center justify-between text-xs transition-all ${bgStyle}`;
+
+                // Left: Exponent Expression
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'w-24 font-bold text-slate-800 text-sm';
+                renderMath(`${a}^{${p}}`, leftDiv);
+
+                // Middle: Value / Fraction Expression
+                const midDiv = document.createElement('div');
+                midDiv.className = 'text-center font-medium text-slate-700';
+
+                if (p > 0) {
+                    midDiv.innerText = `= ${Math.pow(a, p)}`;
+                } else if (p === 0) {
+                    midDiv.innerHTML = `= <span class="text-amber-800 font-extrabold text-base">1</span>`;
+                } else {
+                    const absP = Math.abs(p);
+                    const denom = Math.pow(a, absP);
+                    renderMath(`= \\frac{1}{${a}^{${absP}}} = \\frac{1}{${denom}}`, midDiv);
+                }
+
+                // Right: Division Logic Step
+                const rightDiv = document.createElement('div');
+                rightDiv.className = 'text-right text-[11px] font-bold text-slate-500 w-36';
+                if (p === 3) {
+                    rightDiv.innerText = 'Nilai Awal';
+                } else {
+                    rightDiv.innerHTML = `<span class="text-indigo-600"><i class="fa-solid fa-divide"></i> ${a}</span> dari hasil atas`;
+                }
+
+                row.appendChild(leftDiv);
+                row.appendChild(midDiv);
+                row.appendChild(rightDiv);
+                container.appendChild(row);
+            });
+
+            // Logic Summary Text
+            const logicBox = document.getElementById('t2-logic-summary');
+            logicBox.innerHTML = `
+                <div class="font-bold text-slate-800 mb-1 border-b border-slate-200 pb-1">Kesimpulan Pangkat Basis ${a}:</div>
+                <div class="space-y-1">
+                    <div>• <span id="logic-zero"></span> (dibagi ${a} dari ${a}¹ = ${a})</div>
+                    <div>• <span id="logic-neg"></span> (kebalikan dari ${a}¹)</div>
+                </div>
+            `;
+            renderMath(`${a}^0 = 1`, 'logic-zero');
+            renderMath(`${a}^{-1} = \\frac{1}{${a}^1} = \\frac{1}{${a}}`, 'logic-neg');
+        }
+
+        // ====================================================================
+        // TAB 3: EXPONENT PROPERTIES LOGIC
+        // ====================================================================
+        function setTab3Prop(prop) {
+            activeTab3Prop = prop;
+            
+            const btnMul = document.getElementById('t3-btn-mul');
+            const btnDiv = document.getElementById('t3-btn-div');
+            const btnPow = document.getElementById('t3-btn-pow');
+
+            const inactiveClass = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:text-slate-900 transition flex items-center gap-2';
+            const activeClass = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white shadow-sm transition flex items-center gap-2';
+
+            btnMul.className = (prop === 'mul') ? activeClass : inactiveClass;
+            btnDiv.className = (prop === 'div') ? activeClass : inactiveClass;
+            btnPow.className = (prop === 'pow') ? activeClass : inactiveClass;
+
+            updateTab3Properties();
+        }
+
+        function updateTab3Properties() {
+            const a = parseInt(document.getElementById('t3-a').value);
+            const m = parseInt(document.getElementById('t3-m').value);
+            const n = parseInt(document.getElementById('t3-n').value);
+
+            document.getElementById('t3-a-val').innerText = `a = ${a}`;
+            document.getElementById('t3-m-val').innerText = `m = ${m}`;
+            document.getElementById('t3-n-val').innerText = `n = ${n}`;
+
+            const ruleBox = document.getElementById('t3-rule-box');
+            const visualContainer = document.getElementById('t3-visual-container');
+            visualContainer.innerHTML = '';
+
+            if (activeTab3Prop === 'mul') {
+                const resP = m + n;
+                renderMath(`${a}^{${m}} \\cdot ${a}^{${n}} = ${a}^{${m}+${n}} = ${a}^{${resP}}`, 't3-math-formula');
+                ruleBox.innerHTML = `Sifat Perkalian: Jika dua bilangan berpangkat berbasis sama dikalikan, maka <b>pangkatnya dijumlahkan</b> ($a^m \\cdot a^n = a^{m+n}$).`;
+
+                // Visual Representation
+                const wrap = document.createElement('div');
+                wrap.className = 'flex flex-wrap items-center justify-center gap-2';
+
+                // Group 1
+                const g1 = document.createElement('div');
+                g1.className = 'flex items-center gap-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-xl';
+                for (let i = 0; i < m; i++) {
+                    const item = document.createElement('span');
+                    item.className = 'w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-sm';
+                    item.innerText = a;
+                    g1.appendChild(item);
+                }
+
+                const sign = document.createElement('span');
+                sign.className = 'text-xl font-bold text-slate-400 px-1';
+                sign.innerText = '×';
+
+                // Group 2
+                const g2 = document.createElement('div');
+                g2.className = 'flex items-center gap-1.5 p-2 bg-purple-50 border border-purple-200 rounded-xl';
+                for (let i = 0; i < n; i++) {
+                    const item = document.createElement('span');
+                    item.className = 'w-8 h-8 rounded-lg bg-purple-600 text-white font-bold text-xs flex items-center justify-center shadow-sm';
+                    item.innerText = a;
+                    g2.appendChild(item);
+                }
+
+                wrap.appendChild(g1);
+                wrap.appendChild(sign);
+                wrap.appendChild(g2);
+
+                const desc = document.createElement('div');
+                desc.className = 'text-xs text-slate-600 font-semibold text-center mt-2';
+                desc.innerHTML = `Gabungan faktor: <b>${m} faktor</b> (${a}) + <b>${n} faktor</b> (${a}) = <b>Total ${resP} faktor</b> (${a}<sup>${resP}</sup>).`;
+
+                visualContainer.appendChild(wrap);
+                visualContainer.appendChild(desc);
+
+            } else if (activeTab3Prop === 'div') {
+                const resP = m - n;
+                renderMath(`\\frac{${a}^{${m}}}{${a}^{${n}}} = ${a}^{${m}-${n}} = ${a}^{${resP}}`, 't3-math-formula');
+                ruleBox.innerHTML = `Sifat Pembagian: Jika dua bilangan berpangkat berbasis sama dibagi, maka <b>pangkatnya dikurangkan</b> ($\\frac{a^m}{a^n} = a^{m-n}$).`;
+
+                // Fraction Visual Layout
+                const fracBox = document.createElement('div');
+                fracBox.className = 'flex flex-col items-center justify-center space-y-2';
+
+                const cancelCount = Math.min(m, n);
+
+                // Numerator
+                const numRow = document.createElement('div');
+                numRow.className = 'flex items-center gap-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-xl';
+                for (let i = 0; i < m; i++) {
+                    const item = document.createElement('span');
+                    const isCanceled = i < cancelCount;
+                    item.className = `w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm transition ${
+                        isCanceled ? 'bg-slate-400 opacity-40 cancel-item' : 'bg-indigo-600'
+                    }`;
+                    item.innerText = a;
+                    numRow.appendChild(item);
+                }
+
+                const divider = document.createElement('div');
+                divider.className = 'w-full h-0.5 bg-slate-300 rounded';
+
+                // Denominator
+                const denRow = document.createElement('div');
+                denRow.className = 'flex items-center gap-1.5 p-2 bg-purple-50 border border-purple-200 rounded-xl';
+                for (let i = 0; i < n; i++) {
+                    const item = document.createElement('span');
+                    const isCanceled = i < cancelCount;
+                    item.className = `w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm transition ${
+                        isCanceled ? 'bg-slate-400 opacity-40 cancel-item' : 'bg-purple-600'
+                    }`;
+                    item.innerText = a;
+                    denRow.appendChild(item);
+                }
+
+                fracBox.appendChild(numRow);
+                fracBox.appendChild(divider);
+                fracBox.appendChild(denRow);
+
+                const desc = document.createElement('div');
+                desc.className = 'text-xs text-slate-600 font-semibold text-center mt-2';
+                desc.innerHTML = `Pencoretan Eliminasi: <b>${cancelCount} pasang angka ${a}</b> saling membagi. Sisa faktor = <b>${Math.abs(resP)} faktor</b>.`;
+
+                visualContainer.appendChild(fracBox);
+                visualContainer.appendChild(desc);
+
+            } else if (activeTab3Prop === 'pow') {
+                const resP = m * n;
+                renderMath(`(${a}^{${m}})^{${n}} = ${a}^{${m} \\cdot ${n}} = ${a}^{${resP}}`, 't3-math-formula');
+                ruleBox.innerHTML = `Sifat Perpangkatan: Jika bilangan berpangkat dipangkatkan lagi, maka <b>pangkatnya dikalikan</b> ($(a^m)^n = a^{m \\cdot n}$).`;
+
+                const groupsBox = document.createElement('div');
+                groupsBox.className = 'flex flex-wrap items-center justify-center gap-3';
+
+                for (let j = 0; j < n; j++) {
+                    const g = document.createElement('div');
+                    g.className = 'flex items-center gap-1.5 p-2 bg-indigo-50 border border-indigo-200 rounded-xl relative';
+                    for (let i = 0; i < m; i++) {
+                        const item = document.createElement('span');
+                        item.className = 'w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-sm';
+                        item.innerText = a;
+                        g.appendChild(item);
+                    }
+                    groupsBox.appendChild(g);
+                }
+
+                const desc = document.createElement('div');
+                desc.className = 'text-xs text-slate-600 font-semibold text-center mt-2';
+                desc.innerHTML = `Pengulangan Kelompok: Terdapat <b>${n} kelompok</b> yang masing-masing berisi <b>${m} faktor ${a}</b>. Total faktor = <b>${resP} faktor</b> (${a}<sup>${resP}</sup>).`;
+
+                visualContainer.appendChild(groupsBox);
+                visualContainer.appendChild(desc);
+            }
+        }
+
+        // Window Onload Initialization
+        window.onload = function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ],
+                throwOnError : false
+            });
+
+            initTearChart();
+            setTearBase(2);
+        };
+    </script>
+</body>
+</html>
